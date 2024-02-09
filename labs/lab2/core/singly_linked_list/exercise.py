@@ -150,7 +150,13 @@ class SinglyLinkedList(Base[Item]):
         :returns: the item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        if 0 > index or index >= self.get_length():
+            raise IndexError
+        # if index == self.get_length() - 1:
+        #     return self.get_last_node()
+        for i, node in enumerate(self.nodes_iterator()):
+            if i == index:
+                return node
 
     def get_at(self, index: int) -> Item:
         """
@@ -232,7 +238,7 @@ class SinglyLinkedList(Base[Item]):
         :parameter new_item: the new item to overwrite the old item at the index with
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        self.get_node_at(index).set(new_item)
 
     def set_last(self, new_last_item: Item) -> None:
         """
@@ -299,7 +305,10 @@ class SinglyLinkedList(Base[Item]):
         :parameter new_item: the item to be inserted
         :raises IndexError: unless ``0 <= index <= length``
         """
-        raise NotImplementedError
+        if index == self.get_length():
+            self.insert_last(new_item)
+        else:
+            self.get_node_at(index).insert_previous(new_item)
 
     def insert_last(self, new_last_item: Item) -> None:
         """
@@ -349,7 +358,7 @@ class SinglyLinkedList(Base[Item]):
         :returns: the old item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        return self.get_node_at(index).remove()
 
     def remove_last(self) -> Item:
         """
@@ -422,7 +431,9 @@ class SinglyLinkedList(Base[Item]):
 
         :returns: an iterator over the list's nodes, last-to-first
         """
-        raise NotImplementedError
+        nodes_copy = list(self.nodes_iterator())
+        for node in nodes_copy[::-1]:
+            yield node
 
     def reverse_iterator(self) -> Iterator[Item]:
         """
@@ -687,7 +698,12 @@ class SinglyLinkedNode(Base[Item]):
 
         :parameter new_previous_item: the item the new previous node should contain
         """
-        raise NotImplementedError
+        new_node = SinglyLinkedNode(self.get_list(), new_previous_item, self)
+        if self.is_first():
+            self.get_list()._first_node = new_node
+        else:
+            self.get_previous_node()._next_node = new_node
+        self.get_list()._length += 1
 
     def insert_next(self, new_next_item: Item) -> None:
         """
@@ -701,7 +717,11 @@ class SinglyLinkedNode(Base[Item]):
 
         :parameter new_next_item: the item the new next node should contain
         """
-        raise NotImplementedError
+        new_node = SinglyLinkedNode(self.get_list(), new_next_item, self.get_next_node())
+        if self.is_last():
+            self.get_list()._last_node = new_node
+        self._next_node = new_node
+        self.get_list()._length += 1
 
     def remove_previous(self) -> Item:
         """
@@ -716,7 +736,9 @@ class SinglyLinkedNode(Base[Item]):
         :returns: the old previous item
         :raises ValueError: if there is no previous node
         """
-        raise NotImplementedError
+        if self.is_first():
+            raise ValueError
+        return self.get_previous_node().remove()
 
     def remove(self) -> Item:
         """
@@ -730,7 +752,17 @@ class SinglyLinkedNode(Base[Item]):
 
         :returns: the item the node contained
         """
-        raise NotImplementedError
+        previous_node = self.get_previous_node()
+        next_node = self.get_next_node()
+        if previous_node:
+            previous_node._next_node = next_node
+        else:
+            self.get_list()._first_node = next_node
+        if not next_node:
+            self.get_list()._last_node = previous_node
+        self.get_list()._length -= 1
+        self._next_node = None
+        return self.get()
 
     def remove_next(self) -> Item:
         """
@@ -745,4 +777,11 @@ class SinglyLinkedNode(Base[Item]):
         :returns: the old next item
         :raises ValueError: if there is no next node
         """
-        raise NotImplementedError
+        if self.is_last():
+            raise ValueError
+        next_node = self.get_next_node()
+        self._next_node = next_node.get_next_node()
+        if next_node.is_last():
+            self.get_list()._last_node = self
+        self.get_list()._length -= 1
+        return next_node.get()

@@ -51,7 +51,7 @@ class Player(Base):
 
         :returns: the total xp
         """
-        raise NotImplementedError
+        return self._xp
 
     def get_level(self) -> int:
         """
@@ -109,7 +109,8 @@ class Player(Base):
 
         :returns: the current y
         """
-        raise NotImplementedError
+        x, y = self._position
+        return y
 
     def gain(self, gained_xp: int) -> bool:
         """

@@ -6,7 +6,6 @@ Lab 2: Lists
 Doubly-linked Lists Exercise
 """
 
-
 from collections.abc import Iterator
 from typing import Optional
 
@@ -151,7 +150,21 @@ class DoublyLinkedList(Base[Item]):
         :returns: the item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        if index < 0 or self.get_length() <= index:
+            raise IndexError
+        middle = self.get_length() / 2
+        if index < middle:
+            count = 0
+            for node in self.nodes_iterator():
+                if count == index:
+                    return node
+                count += 1
+        else:
+            reverse_count = self.get_length() - 1
+            for node in self.reverse_nodes_iterator():
+                if reverse_count == index:
+                    return node
+                reverse_count -= 1
 
     def get_at(self, index: int) -> Item:
         """
@@ -234,7 +247,8 @@ class DoublyLinkedList(Base[Item]):
         :parameter new_item: the new item to overwrite the old item at the index with
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        node = self.get_node_at(index)
+        node.set(new_item)
 
     def set_last(self, new_last_item: Item) -> None:
         """
@@ -301,7 +315,12 @@ class DoublyLinkedList(Base[Item]):
         :parameter new_item: the item to be inserted
         :raises IndexError: unless ``0 <= index <= length``
         """
-        raise NotImplementedError
+        if index == 0:
+            self.insert_first(new_item)
+        elif index == self.get_length():
+            self.insert_last(new_item)
+        else:
+            self.get_node_at(index).insert_previous(new_item)
 
     def insert_last(self, new_last_item: Item) -> None:
         """
@@ -351,7 +370,8 @@ class DoublyLinkedList(Base[Item]):
         :returns: the old item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        node = self.get_node_at(index)
+        return node.remove()
 
     def remove_last(self) -> Item:
         """
@@ -414,7 +434,10 @@ class DoublyLinkedList(Base[Item]):
 
         :returns: an iterator over the list's nodes, last-to-first
         """
-        raise NotImplementedError
+        node = self._last_node
+        while node is not None:
+            yield node
+            node = node.get_previous_node()
 
     def reverse_iterator(self) -> Iterator[Item]:
         """
@@ -446,11 +469,11 @@ class DoublyLinkedNode(Base[Item]):
     _next_node: Optional["DoublyLinkedNode[Item]"]
 
     def __init__(
-        self,
-        list: "DoublyLinkedList[Item]",
-        item: Item,
-        previous_node: Optional["DoublyLinkedNode[Item]"] = None,
-        next_node: Optional["DoublyLinkedNode[Item]"] = None,
+            self,
+            list: "DoublyLinkedList[Item]",
+            item: Item,
+            previous_node: Optional["DoublyLinkedNode[Item]"] = None,
+            next_node: Optional["DoublyLinkedNode[Item]"] = None,
     ) -> None:
         """
         Initialize this node.
@@ -667,7 +690,14 @@ class DoublyLinkedNode(Base[Item]):
 
         :parameter new_previous_item: the item the new previous node should contain
         """
-        raise NotImplementedError
+        old_previous_node = self.get_previous_node()
+        new_node = DoublyLinkedNode(self.get_list(), new_previous_item, old_previous_node, self)
+        self._previous_node = new_node
+        self.get_list()._length += 1
+        if old_previous_node:
+            old_previous_node._next_node = new_node
+        else:
+            self.get_list()._first_node = new_node
 
     def insert_next(self, new_next_item: Item) -> None:
         """
@@ -681,7 +711,14 @@ class DoublyLinkedNode(Base[Item]):
 
         :parameter new_next_item: the item the new next node should contain
         """
-        raise NotImplementedError
+        old_next_node = self.get_next_node()
+        new_node = DoublyLinkedNode(self._list, new_next_item, self, old_next_node)
+        self._next_node = new_node
+        self.get_list()._length += 1
+        if old_next_node:
+            old_next_node._previous_node = new_node
+        else:
+            self.get_list()._last_node = new_node
 
     def remove_previous(self) -> Item:
         """
@@ -696,7 +733,9 @@ class DoublyLinkedNode(Base[Item]):
         :returns: the old previous item
         :raises ValueError: if there is no previous node
         """
-        raise NotImplementedError
+        if self.is_first():
+            raise ValueError
+        return self.get_previous_node().remove()
 
     def remove(self) -> Item:
         """
@@ -710,7 +749,20 @@ class DoublyLinkedNode(Base[Item]):
 
         :returns: the item the node contained
         """
-        raise NotImplementedError
+        previous_node = self.get_previous_node()
+        next_node = self.get_next_node()
+        if previous_node:
+            previous_node._next_node = next_node
+        else:
+            self.get_list()._first_node = next_node
+        if next_node:
+            next_node._previous_node = previous_node
+        else:
+            self.get_list()._last_node = previous_node
+        self._next_node = None
+        self._previous_node = None
+        self.get_list()._length -= 1
+        return self.get()
 
     def remove_next(self) -> Item:
         """
@@ -725,4 +777,6 @@ class DoublyLinkedNode(Base[Item]):
         :returns: the old next item
         :raises ValueError: if there is no next node
         """
-        raise NotImplementedError
+        if self.is_last():
+            raise ValueError
+        return self.get_next_node().remove()

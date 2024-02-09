@@ -6,7 +6,6 @@ Lab 2: Lists
 Static Array Lists Exercise
 """
 
-
 from collections.abc import Iterator
 
 from lib.array import Array
@@ -227,7 +226,16 @@ class StaticArrayList(Base[Item]):
         :parameter new_item: the item to be inserted
         :raises IndexError: unless ``0 <= index <= length``
         """
-        raise NotImplementedError
+        if not (0 <= index <= self.get_length()):
+            raise IndexError
+        new_array = Array(self.get_length() + 1)
+        new_array.set_at(index, new_item)
+        offset = 0
+        for i, item in enumerate(self.iterator()):
+            if i == index:
+                offset = 1
+            new_array.set_at(i + offset, item)
+        self._array = new_array
 
     def insert_last(self, new_last_item: Item) -> None:
         """
@@ -274,7 +282,19 @@ class StaticArrayList(Base[Item]):
         :returns: the old item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        if not (0 <= index < self.get_length()):
+            raise IndexError
+        new_array = Array(self.get_length() - 1)
+
+        offset = 0
+        for i, item in enumerate(self.iterator()):
+            if i == index:
+                offset = 1
+                continue
+            new_array.set_at(i - offset, item)
+        removed_item = self.get_at(index)
+        self._array = new_array
+        return removed_item
 
     def remove_last(self) -> Item:
         """

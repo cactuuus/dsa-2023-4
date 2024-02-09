@@ -94,7 +94,7 @@ class Pair(Base[Item]):
 
         :returns: the second item
         """
-        raise NotImplementedError
+        return self._second
 
     def set_first(self, new_first: Item) -> None:
         """
@@ -151,4 +151,5 @@ class Pair(Base[Item]):
 
         :returns: an iterator over the pair's items, second-then-first
         """
-        raise NotImplementedError
+        yield self._second
+        yield self._first

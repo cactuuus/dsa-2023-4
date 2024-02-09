@@ -42,7 +42,7 @@ def is_even(number: int) -> bool:
     :parameter number: the number to check for evenness
     :returns: ``True`` if ``number`` is even, else ``False``
     """
-    raise NotImplementedError
+    return number % 2 == 0
 
 
 def is_prime(number: int) -> bool:
