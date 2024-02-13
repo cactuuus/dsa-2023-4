@@ -86,7 +86,13 @@ class DynamicArrayList(Base[Item]):
         :parameter new_capacity: the new capacity
         :raises ValueError: if the new capacity is less than the length
         """
-        raise NotImplementedError
+        if new_capacity < self.get_length():
+            raise ValueError('new_capacity is less than the length of the array')
+        elif new_capacity != self.get_capacity():
+            new_array = Array(new_capacity)
+            for index, item in enumerate(self.iterator()):
+                new_array.set_at(index, item)
+            self._array = new_array
 
     def _grow_if_should(self) -> None:
         """
@@ -306,7 +312,7 @@ class DynamicArrayList(Base[Item]):
 
         :parameter new_first_item: the new first item
         """
-        raise NotImplementedError
+        self.insert_at(0, new_first_item)
 
     def insert_last(self, new_last_item: Item) -> None:
         """
@@ -320,7 +326,7 @@ class DynamicArrayList(Base[Item]):
 
         :parameter new_last_item: the new last item
         """
-        raise NotImplementedError
+        self.insert_at(self.get_length(), new_last_item)
 
     def insert_at(self, index: int, new_item: Item) -> None:
         """
@@ -336,7 +342,13 @@ class DynamicArrayList(Base[Item]):
         :parameter new_item: the item to be inserted
         :raises IndexError: unless ``0 <= index <= length``
         """
-        raise NotImplementedError
+        if not (0 <= index <= self.get_length()):
+            raise IndexError("")
+        self._grow_if_should()
+        for i in range(self.get_length(), index, -1):
+            self.set_at(i, self.get_at(i-1))
+        self.set_at(index, new_item)
+        self._length += 1
 
     def remove_first(self) -> Item:
         """
@@ -351,7 +363,7 @@ class DynamicArrayList(Base[Item]):
         :returns: the old first item
         :raises EmptyCollectionError: if the list is empty
         """
-        raise NotImplementedError
+        self.remove_at(0)
 
     def remove_last(self) -> Item:
         """
@@ -366,7 +378,7 @@ class DynamicArrayList(Base[Item]):
         :returns: the old last item
         :raises EmptyCollectionError: if the list is empty
         """
-        raise NotImplementedError
+        self.remove_at(self.get_length() - 1)
 
     def remove_at(self, index: int) -> Item:
         """
@@ -382,7 +394,14 @@ class DynamicArrayList(Base[Item]):
         :returns: the old item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        if not (0 <= index < self.get_length()):
+            raise IndexError("")
+        removed_item = self.get_at(index)
+        self._length -= 1
+        for i in range(index, self.get_length()):
+            self.set_at(i, self.get_at(i + 1))
+        self._shrink_if_should()
+        return removed_item
 
     def iterator(self) -> Iterator[Item]:
         """

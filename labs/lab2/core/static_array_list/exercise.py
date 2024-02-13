@@ -285,7 +285,6 @@ class StaticArrayList(Base[Item]):
         if not (0 <= index < self.get_length()):
             raise IndexError
         new_array = Array(self.get_length() - 1)
-
         offset = 0
         for i, item in enumerate(self.iterator()):
             if i == index:
