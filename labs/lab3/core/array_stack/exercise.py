@@ -132,7 +132,7 @@ class ArrayStack(Base[Item]):
 
         :parameter new_top_item: the item to push
         """
-        raise NotImplementedError
+        self._array_list.insert_last(new_top_item)
 
     def peek(self) -> Item:
         """
@@ -147,7 +147,7 @@ class ArrayStack(Base[Item]):
         :returns: the top item
         :raises EmptyCollectionError: if the stack is empty
         """
-        raise NotImplementedError
+        return self._array_list.get_last()
 
     def pop(self) -> Item:
         """
@@ -162,7 +162,7 @@ class ArrayStack(Base[Item]):
         :returns: the old top item
         :raises EmptyCollectionError: if the stack is empty
         """
-        raise NotImplementedError
+        return self._array_list.remove_last()
 
     def iterator(self) -> Iterator[Item]:
         """

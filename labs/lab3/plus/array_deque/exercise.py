@@ -131,7 +131,7 @@ class ArrayDeque(Base[Item]):
         :returns: the first item
         :raises EmptyCollectionError: if the deque is empty
         """
-        raise NotImplementedError
+        return self._circular_array_list.get_first()
 
     def get_last(self) -> Item:
         """
@@ -146,7 +146,7 @@ class ArrayDeque(Base[Item]):
         :returns: the last item
         :raises EmptyCollectionError: if the deque is empty
         """
-        raise NotImplementedError
+        return self._circular_array_list.get_last()
 
     def insert_first(self, new_first_item: Item) -> None:
         """
@@ -160,7 +160,7 @@ class ArrayDeque(Base[Item]):
 
         :parameter new_first_item: the new first item
         """
-        raise NotImplementedError
+        self._circular_array_list.insert_first(new_first_item)
 
     def insert_last(self, new_last_item: Item) -> None:
         """
@@ -174,7 +174,7 @@ class ArrayDeque(Base[Item]):
 
         :parameter new_last_item: the new last item
         """
-        raise NotImplementedError
+        self._circular_array_list.insert_last(new_last_item)
 
     def remove_first(self) -> Item:
         """
@@ -189,7 +189,7 @@ class ArrayDeque(Base[Item]):
         :returns: the old first item
         :raises EmptyCollectionError: if the deque is empty
         """
-        raise NotImplementedError
+        return self._circular_array_list.remove_first()
 
     def remove_last(self) -> Item:
         """
@@ -204,7 +204,7 @@ class ArrayDeque(Base[Item]):
         :returns: the old last item
         :raises EmptyCollectionError: if the deque is empty
         """
-        raise NotImplementedError
+        return self._circular_array_list.remove_last()
 
     def iterator(self) -> Iterator[Item]:
         """

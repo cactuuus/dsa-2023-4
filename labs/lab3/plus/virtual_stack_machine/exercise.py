@@ -190,13 +190,35 @@ class VirtualStackMachine(Base):
                 value = self.fetch()
                 self._values.push(value)
             case Opcode.DUPE:
-                raise NotImplementedError
+                value = self._values.peek()
+                self._values.push(value)
             case Opcode.MOVU:
-                raise NotImplementedError
+                temp_stack = Stack()
+                index = self._values.pop()
+                if index >= self._values.get_length():
+                    raise IndexError("Index out of range")
+                for _ in range(index):
+                    temp_stack.push(self._values.pop())
+                new_top_value = self._values.pop()
+                while not temp_stack.is_empty():
+                    self._values.push(temp_stack.pop())
+                self._values.push(new_top_value)
             case Opcode.MOVD:
-                raise NotImplementedError
+                temp_stack = Stack()
+                index = self._values.pop()
+                if index >= self._values.get_length():
+                    raise IndexError("Index out of range")
+                old_top_value = self._values.pop()
+                for _ in range(index):
+                    temp_stack.push(self._values.pop())
+                self._values.push(old_top_value)
+                while not temp_stack.is_empty():
+                    self._values.push(temp_stack.pop())
             case Opcode.SWAP:
-                raise NotImplementedError
+                old_top_value = self._values.pop()
+                new_top_value = self._values.pop()
+                self._values.push(old_top_value)
+                self._values.push(new_top_value)
             case Opcode.POP:
                 self._values.pop()
             case Opcode.EMPTY:

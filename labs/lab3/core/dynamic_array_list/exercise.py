@@ -248,6 +248,8 @@ class DynamicArrayList(Base[Item]):
         :returns: the item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
+        if not (0 <= index < self.get_length()):
+            raise IndexError(f"Index {index} out of range [0, {self.get_length()}]")
         return self._array.get_at(index)
 
     def set_first(self, new_first_item: Item) -> None:
@@ -298,6 +300,8 @@ class DynamicArrayList(Base[Item]):
         :parameter new_item: the new item to overwrite the old item at the index with
         :raises IndexError: unless ``0 <= index < length``
         """
+        if not(0 <= index < self.get_length()):
+            raise IndexError(f"index {index} is out of range [0, {self.get_length()}]")
         self._array.set_at(index, new_item)
 
     def insert_first(self, new_first_item: Item) -> None:
@@ -345,10 +349,10 @@ class DynamicArrayList(Base[Item]):
         if not (0 <= index <= self.get_length()):
             raise IndexError("")
         self._grow_if_should()
-        for i in range(self.get_length(), index, -1):
+        self._length += 1
+        for i in range(self.get_length() - 1, index, -1):
             self.set_at(i, self.get_at(i-1))
         self.set_at(index, new_item)
-        self._length += 1
 
     def remove_first(self) -> Item:
         """
@@ -363,7 +367,9 @@ class DynamicArrayList(Base[Item]):
         :returns: the old first item
         :raises EmptyCollectionError: if the list is empty
         """
-        self.remove_at(0)
+        if self.is_empty():
+            raise EmptyCollectionError()
+        return self.remove_at(0)
 
     def remove_last(self) -> Item:
         """
@@ -378,7 +384,9 @@ class DynamicArrayList(Base[Item]):
         :returns: the old last item
         :raises EmptyCollectionError: if the list is empty
         """
-        self.remove_at(self.get_length() - 1)
+        if self.is_empty():
+            raise EmptyCollectionError()
+        return self.remove_at(self.get_length() - 1)
 
     def remove_at(self, index: int) -> Item:
         """
@@ -397,9 +405,9 @@ class DynamicArrayList(Base[Item]):
         if not (0 <= index < self.get_length()):
             raise IndexError("")
         removed_item = self.get_at(index)
-        self._length -= 1
-        for i in range(index, self.get_length()):
+        for i in range(index, self.get_length() - 1):
             self.set_at(i, self.get_at(i + 1))
+        self._length -= 1
         self._shrink_if_should()
         return removed_item
 

@@ -101,9 +101,9 @@ def shunt(tokens: Iterator[Token]) -> Iterator[Token]:
     for token in tokens:
         match token:
             case ValueToken():
-                raise NotImplementedError
+                output.enqueue(token)
             case FunctionToken():
-                raise NotImplementedError
+                stack.push(token)
             case OperatorToken(operator=token_operator):
                 while not stack.is_empty():
                     match stack.peek():
@@ -123,24 +123,25 @@ def shunt(tokens: Iterator[Token]) -> Iterator[Token]:
                             # this shouldn't happen
                             # because we don't push anything else
                             assert False
-                    raise NotImplementedError
-                raise NotImplementedError
+                    output.enqueue(stack.pop())
+                stack.push(token)
             case CommaToken():
                 while not stack.is_empty() and type(stack.peek()) is not ParenthesisToken:
-                    raise NotImplementedError
+                    output.enqueue(stack.pop())
             case ParenthesisToken(parenthesis=Parenthesis.OPENING):
-                raise NotImplementedError
+                stack.push(token)
             case ParenthesisToken(parenthesis=Parenthesis.CLOSING):
                 while not stack.is_empty() and type(stack.peek()) is not ParenthesisToken:
-                    raise NotImplementedError
+                    output.enqueue(stack.pop())
                 if stack.is_empty():
-                    raise ValueError("closing parenthesis with no matching opening parenthesis")
-                raise NotImplementedError
+                    raise ValueError("closing parenthesis with no matching opening parenthesis1")
+                if type(stack.pop()) is not ParenthesisToken:
+                    raise ValueError("closing parenthesis with no matching opening parenthesis2")
                 if not stack.is_empty() and type(stack.peek()) is FunctionToken:
-                    raise NotImplementedError
+                    output.enqueue(stack.pop())
     while not stack.is_empty():
         token = stack.pop()
         if type(token) is ParenthesisToken:
-            raise ValueError("opening parenthesis with no matching closing parenthesis")
-        raise NotImplementedError
+            raise ValueError("opening parenthesis with no matching closing parenthesis3")
+        output.enqueue(token)
     return output.iterator()

@@ -110,7 +110,7 @@ class LinkedQueue(Base[Item]):
 
         :parameter new_back_item: the item to enqueue
         """
-        raise NotImplementedError
+        self._linked_list.insert_last(new_back_item)
 
     def front(self) -> Item:
         """
@@ -125,7 +125,7 @@ class LinkedQueue(Base[Item]):
         :returns: the front item
         :raises EmptyCollectionError: if the queue is empty
         """
-        raise NotImplementedError
+        return self._linked_list.get_first()
 
     def dequeue(self) -> Item:
         """
@@ -140,7 +140,7 @@ class LinkedQueue(Base[Item]):
         :returns: the old front item
         :raises EmptyCollectionError: if the queue is empty
         """
-        raise NotImplementedError
+        return self._linked_list.remove_first()
 
     def iterator(self) -> Iterator[Item]:
         """

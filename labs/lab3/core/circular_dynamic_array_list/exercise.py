@@ -94,6 +94,7 @@ class CircularDynamicArrayList(Base[Item]):
         for i in range(self.get_length()):
             new_array.set_at(i, self.get_at(i))
         self._array = new_array
+        self._first_index = 0
 
     def _grow_if_should(self) -> None:
         """
@@ -214,6 +215,8 @@ class CircularDynamicArrayList(Base[Item]):
         :returns: the first item
         :raises EmptyCollectionError: if the list is empty
         """
+        if self.is_empty():
+            raise EmptyCollectionError()
         return self.get_at(0)
 
     def get_last(self) -> Item:
@@ -229,6 +232,8 @@ class CircularDynamicArrayList(Base[Item]):
         :returns: the last item
         :raises EmptyCollectionError: if the list is empty
         """
+        if self.is_empty():
+            raise EmptyCollectionError()
         return self.get_at(self._length - 1)
 
     def get_at(self, index: int) -> Item:
@@ -247,7 +252,8 @@ class CircularDynamicArrayList(Base[Item]):
         """
         if not (0 <= index < self.get_length()):
             raise IndexError("")
-        return self._array.get_at((self._first_index + index) % self.get_capacity())
+        adjusted_index = (self._first_index + index) % self.get_capacity()
+        return self._array.get_at(adjusted_index)
 
     def set_first(self, new_first_item: Item) -> None:
         """
@@ -262,6 +268,8 @@ class CircularDynamicArrayList(Base[Item]):
         :parameter new_first_item: the new item to overwrite the old first item with
         :raises EmptyCollectionError: if the list is empty
         """
+        if self.is_empty():
+            raise EmptyCollectionError("")
         self.set_at(0, new_first_item)
 
     def set_last(self, new_last_item: Item) -> None:
@@ -277,6 +285,8 @@ class CircularDynamicArrayList(Base[Item]):
         :parameter new_last_item: the new item to overwrite the old last item with
         :raises EmptyCollectionError: if the list is empty
         """
+        if self.is_empty():
+            raise EmptyCollectionError("")
         self.set_at(self.get_length() - 1, new_last_item)
 
     def set_at(self, index: int, new_item: Item) -> None:
@@ -294,8 +304,9 @@ class CircularDynamicArrayList(Base[Item]):
         :raises IndexError: unless ``0 <= index < length``
         """
         if not (0 <= index < self.get_length()):
-            raise IndexError("")
-        self._array.set_at((self._first_index + index) % self.get_capacity(), new_item)
+            raise IndexError(f"index {index} is out of range [0, {self.get_length()}]")
+        adjusted_index = (self._first_index + index) % self.get_capacity()
+        self._array.set_at(adjusted_index, new_item)
 
     def insert_first(self, new_first_item: Item) -> None:
         """
@@ -340,12 +351,15 @@ class CircularDynamicArrayList(Base[Item]):
         :raises IndexError: unless ``0 <= index <= length``
         """
         if not (0 <= index <= self.get_length()):
-            raise IndexError("")
+            raise IndexError(f"index {index} out of range [0, {self.get_length()}]")
         self._grow_if_should()
-        for i in range(index, self.get_length()):
-            self.set_at(i + 1, self.get_at(i))
-        self.set_at(index, new_item)
         self._length += 1
+        if index == 0 and self._length != 1:
+            self._first_index -= 1
+        else:
+            for i in range(self.get_length() - 1, index, -1):
+                self.set_at(i, self.get_at(i - 1))
+        self.set_at(index, new_item)
 
     def remove_first(self) -> Item:
         """
@@ -360,7 +374,9 @@ class CircularDynamicArrayList(Base[Item]):
         :returns: the old first item
         :raises EmptyCollectionError: if the list is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError("")
+        return self.remove_at(0)
 
     def remove_last(self) -> Item:
         """
@@ -375,7 +391,9 @@ class CircularDynamicArrayList(Base[Item]):
         :returns: the old last item
         :raises EmptyCollectionError: if the list is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        return self.remove_at(self.get_length() - 1)
 
     def remove_at(self, index: int) -> Item:
         """
@@ -391,7 +409,17 @@ class CircularDynamicArrayList(Base[Item]):
         :returns: the old item at that index
         :raises IndexError: unless ``0 <= index < length``
         """
-        raise NotImplementedError
+        if not (0 <= index < self.get_length()):
+            raise IndexError
+        removed_item = self.get_at(index)
+        if index == 0:
+            self._first_index += 1
+        else:
+            for i in range(index, self.get_length() - 1):
+                self.set_at(i, self.get_at(i + 1))
+        self._length -= 1
+        self._shrink_if_should()
+        return removed_item
 
     def iterator(self) -> Iterator[Item]:
         """

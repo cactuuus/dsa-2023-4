@@ -110,7 +110,7 @@ class LinkedStack(Base[Item]):
 
         :parameter new_top_item: the item to push
         """
-        raise NotImplementedError
+        self._linked_list.insert_first(new_top_item)
 
     def peek(self) -> Item:
         """
@@ -125,7 +125,7 @@ class LinkedStack(Base[Item]):
         :returns: the top item
         :raises EmptyCollectionError: if the stack is empty
         """
-        raise NotImplementedError
+        return self._linked_list.get_first()
 
     def pop(self) -> Item:
         """
@@ -140,7 +140,7 @@ class LinkedStack(Base[Item]):
         :returns: the old top item
         :raises EmptyCollectionError: if the stack is empty
         """
-        raise NotImplementedError
+        return self._linked_list.remove_first()
 
     def iterator(self) -> Iterator[Item]:
         """
