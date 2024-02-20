@@ -31,7 +31,18 @@ def _binary_search_between(array: Array[Item], item: Item, lower_index: int, upp
     :parameter upper_index: the upper bound of indices to check
     :returns: the index of the item if it's in the given range of the array, else ``None``
     """
-    raise NotImplementedError
+    if array.get_length() == 0:
+        return None
+    if upper_index - lower_index == 0:
+        return lower_index if array.get_at(lower_index) == item else None
+    mid = (lower_index + upper_index) // 2
+    current = array.get_at(mid)
+    if current == item:
+        return mid
+    elif current > item:
+        return _binary_search_between(array, item, lower_index, mid)
+    else:
+        return _binary_search_between(array, item, mid + 1, upper_index)
 
 
 def binary_search(array: Array[Item], item: Item) -> Optional[int]:

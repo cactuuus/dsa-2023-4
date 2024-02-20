@@ -37,4 +37,8 @@ def insertion_sort(array: Array[Item]) -> None:
 
     :parameter array: the array to sort
     """
-    raise NotImplementedError
+    for i in range(1, array.get_length()):
+        j = i
+        while j > 0 and array.get_at(j) < array.get_at(j - 1):
+            _swap(array, j, j - 1)
+            j -= 1

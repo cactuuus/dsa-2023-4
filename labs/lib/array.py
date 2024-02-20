@@ -89,7 +89,7 @@ class Array(Base[Item]):
         :raises IndexError: unless ``0 <= index < length``
         """
         if not 0 <= index < self.get_length():
-            raise IndexError
+            raise IndexError(f"index {index} out of range: min {0} / max {self.get_length() - 1}")
         return self._items[index]
 
     def set_at(self, index: int, new_item: Optional[Item]) -> None:

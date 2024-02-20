@@ -37,4 +37,9 @@ def selection_sort(array: Array[Item]) -> None:
 
     :parameter array: the array to sort
     """
-    raise NotImplementedError
+    for i in range(array.get_length()):
+        min_index = i
+        for j in range(i + 1, array.get_length()):
+            if array.get_at(j) < array.get_at(min_index):
+                min_index = j
+        _swap(array, i, min_index)
