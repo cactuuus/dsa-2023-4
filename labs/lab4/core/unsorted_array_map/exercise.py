@@ -128,7 +128,11 @@ class UnsortedArrayMap(Generic[Key, Value]):
         :parameter key: the key
         :parameter new_value: the new value that that key should map to
         """
-        raise NotImplementedError
+        for index, entry in enumerate(self.iterator()):
+            if entry[0] == key:
+                self._array_list.set_at(index, (key, new_value))
+                return
+        self._array_list.insert_last((key, new_value))
 
     def remove(self, key: Key) -> Value:
         """
@@ -144,7 +148,10 @@ class UnsortedArrayMap(Generic[Key, Value]):
         :returns: the corresponding value
         :raises KeyError: if the key was not in the map
         """
-        raise NotImplementedError
+        for index, entry in enumerate(self.iterator()):
+            if entry[0] == key:
+                return self._array_list.remove_at(index)[1]
+        raise KeyError
 
     def iterator(self) -> Iterator[tuple[Key, Value]]:
         """

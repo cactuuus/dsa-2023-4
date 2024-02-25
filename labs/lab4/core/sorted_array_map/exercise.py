@@ -148,7 +148,19 @@ class SortedArrayMap(Generic[Key, Value]):
         :parameter key: the key
         :parameter new_value: the new value that that key should map to
         """
-        raise NotImplementedError
+        lower_bound = 0
+        upper_bound = self.get_length() - 1
+        while lower_bound <= upper_bound:
+            middle = (lower_bound + upper_bound) // 2
+            current_key = self._get_key_at(middle)
+            if current_key == key:
+                self._array_list.set_at(middle, (key, new_value))
+                return
+            elif current_key < key:
+                lower_bound = middle + 1
+            else:
+                upper_bound = middle - 1
+        self._array_list.insert_at(lower_bound, (key, new_value))
 
     def remove(self, key: Key) -> Value:
         """
@@ -164,7 +176,19 @@ class SortedArrayMap(Generic[Key, Value]):
         :returns: the corresponding value
         :raises KeyError: if the key was not in the map
         """
-        raise NotImplementedError
+        lower_bound = 0
+        upper_bound = self.get_length() - 1
+        while lower_bound <= upper_bound:
+            middle = (lower_bound + upper_bound) // 2
+            current_key = self._get_key_at(middle)
+            if current_key == key:
+                return self._array_list.remove_at(middle)[1]
+            elif current_key < key:
+                lower_bound = middle + 1
+            else:
+                upper_bound = middle - 1
+        raise KeyError
+
 
     def iterator(self) -> Iterator[tuple[Key, Value]]:
         """
