@@ -3,7 +3,7 @@ Data Structures & Algorithms
 
 Lab 4: Sorting & Array Maps
 
-Sorted Array Maps Exercise
+Unsorted Array Maps Solution
 """
 
 from collections.abc import Iterator
@@ -14,12 +14,12 @@ from lib.type_vars import Key, Value
 from lab2.core.static_array_list import StaticArrayList
 
 
-class SortedArrayMap(Base[Key, Value]):
+class UnsortedArrayMap(Base[Key, Value]):
     _array_list: StaticArrayList[tuple[Key, Value]]
 
     def __init__(self) -> None:
         """
-        Initialize this sorted array map.
+        Initialize this unsorted array map.
 
         +--------+------+
         | Time:  | O(1) |
@@ -30,9 +30,9 @@ class SortedArrayMap(Base[Key, Value]):
         self._array_list = StaticArrayList()
 
     @staticmethod
-    def build(mappings: Iterator[tuple[Key, Value]]) -> "SortedArrayMap[Key, Value]":
+    def build(mappings: Iterator[tuple[Key, Value]]) -> "UnsortedArrayMap[Key, Value]":
         """
-        Build an sorted array map containing the given key/value mappings.
+        Build an unsorted array map containing the given key/value mappings.
 
         +--------+---------------------------------+
         | Time:  | O(build(mappings).get_length()) |
@@ -41,9 +41,9 @@ class SortedArrayMap(Base[Key, Value]):
         +--------+---------------------------------+
 
         :parameter items: an iterator of initial mappings
-        :returns: an sorted array map with those mappings
+        :returns: an unsorted array map with those mappings
         """
-        map = SortedArrayMap()
+        map = UnsortedArrayMap()
         for key, value in mappings:
             map.insert(key, value)
         return map
@@ -52,26 +52,18 @@ class SortedArrayMap(Base[Key, Value]):
         """
         Check if this map contains the given key.
 
-        +--------+----------------------------+
-        | Time:  | O(log2(self.get_length())) |
-        +--------+----------------------------+
-        | Space: | O(1)                       |
-        +--------+----------------------------+
+        +--------+----------------------+
+        | Time:  | O(self.get_length()) |
+        +--------+----------------------+
+        | Space: | O(1)                 |
+        +--------+----------------------+
 
         :parameter key: the key to search for
         :returns: ``True`` if the key is in the map, else ``False``
         """
-        lower_index = 0
-        upper_index = self.get_length() - 1
-        while lower_index <= upper_index:
-            middle_index = (lower_index + upper_index) // 2
-            middle_key = self._get_key_at(middle_index)
-            if key == middle_key:
+        for contained_key in self.keys_iterator():
+            if key == contained_key:
                 return True
-            if key < middle_key:
-                upper_index = middle_index - 1
-            else:
-                lower_index = middle_index + 1
         return False
 
     def is_empty(self) -> bool:
@@ -103,35 +95,23 @@ class SortedArrayMap(Base[Key, Value]):
         """
         return self._array_list.get_length()
 
-    def _get_key_at(self, index: int) -> Key:
-        key, value = self._array_list.get_at(index)
-        return key
-
     def get(self, key: Key) -> Value:
         """
         Get the value mapped to by the given key in this map.
 
-        +--------+----------------------------+
-        | Time:  | O(log2(self.get_length())) |
-        +--------+----------------------------+
-        | Space: | O(1)                       |
-        +--------+----------------------------+
+        +--------+----------------------+
+        | Time:  | O(self.get_length()) |
+        +--------+----------------------+
+        | Space: | O(1)                 |
+        +--------+----------------------+
 
         :parameter key: the key
         :returns: the corresponding value
         :raises KeyError: if the key is not in the map
         """
-        lower_index = 0
-        upper_index = self.get_length() - 1
-        while lower_index <= upper_index:
-            middle_index = (lower_index + upper_index) // 2
-            middle_key, middle_value = self._array_list.get_at(middle_index)
-            if key == middle_key:
-                return middle_value
-            if key < middle_key:
-                upper_index = middle_index - 1
-            else:
-                lower_index = middle_index + 1
+        for contained_key, contained_value in self.iterator():
+            if key == contained_key:
+                return contained_value
         raise KeyError
 
     def insert(self, key: Key, new_value: Value) -> None:
@@ -139,56 +119,43 @@ class SortedArrayMap(Base[Key, Value]):
         Insert the given key/value mapping into this map.
         If the key is already in the map, set it to map to the new value.
 
-        +--------+----------------------------+
-        | Time:  | O(log2(self.get_length())) |
-        +--------+----------------------------+
-        | Space: | O(1)                       |
-        +--------+----------------------------+
+        +--------+----------------------+
+        | Time:  | O(self.get_length()) |
+        +--------+----------------------+
+        | Space: | O(1)                 |
+        +--------+----------------------+
 
         :parameter key: the key
         :parameter new_value: the new value that that key should map to
         """
-        lower_bound = 0
-        upper_bound = self.get_length() - 1
-        while lower_bound <= upper_bound:
-            middle = (lower_bound + upper_bound) // 2
-            current_key = self._get_key_at(middle)
-            if current_key == key:
-                self._array_list.set_at(middle, (key, new_value))
+        mapping = key, new_value
+        for index in range(self.get_length()):
+            contained_key, contained_value = self._array_list.get_at(index)
+            if key == contained_key:
+                self._array_list.set_at(index, mapping)
                 return
-            elif current_key < key:
-                lower_bound = middle + 1
-            else:
-                upper_bound = middle - 1
-        self._array_list.insert_at(lower_bound, (key, new_value))
+        self._array_list.insert_last(mapping)
 
     def remove(self, key: Key) -> Value:
         """
         Remove the mapping for the given key from this map, and return the value that it mapped to.
 
-        +--------+----------------------------+
-        | Time:  | O(log2(self.get_length())) |
-        +--------+----------------------------+
-        | Space: | O(1)                       |
-        +--------+----------------------------+
+        +--------+----------------------+
+        | Time:  | O(self.get_length()) |
+        +--------+----------------------+
+        | Space: | O(1)                 |
+        +--------+----------------------+
 
         :parameter key: the key
         :returns: the corresponding value
         :raises KeyError: if the key was not in the map
         """
-        lower_bound = 0
-        upper_bound = self.get_length() - 1
-        while lower_bound <= upper_bound:
-            middle = (lower_bound + upper_bound) // 2
-            current_key = self._get_key_at(middle)
-            if current_key == key:
-                return self._array_list.remove_at(middle)[1]
-            elif current_key < key:
-                lower_bound = middle + 1
-            else:
-                upper_bound = middle - 1
+        for index in range(self.get_length()):
+            contained_key, contained_value = self._array_list.get_at(index)
+            if key == contained_key:
+                self._array_list.remove_at(index)
+                return contained_value
         raise KeyError
-
 
     def iterator(self) -> Iterator[tuple[Key, Value]]:
         """

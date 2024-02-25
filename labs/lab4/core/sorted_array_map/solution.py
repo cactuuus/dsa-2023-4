@@ -3,7 +3,7 @@ Data Structures & Algorithms
 
 Lab 4: Sorting & Array Maps
 
-Sorted Array Maps Exercise
+Sorted Array Maps Solution
 """
 
 from collections.abc import Iterator
@@ -148,19 +148,23 @@ class SortedArrayMap(Base[Key, Value]):
         :parameter key: the key
         :parameter new_value: the new value that that key should map to
         """
-        lower_bound = 0
-        upper_bound = self.get_length() - 1
-        while lower_bound <= upper_bound:
-            middle = (lower_bound + upper_bound) // 2
-            current_key = self._get_key_at(middle)
-            if current_key == key:
-                self._array_list.set_at(middle, (key, new_value))
+        mapping = key, new_value
+        lower_index = 0
+        upper_index = self.get_length() - 1
+        index = 0
+        while lower_index <= upper_index:
+            middle_index = (lower_index + upper_index) // 2
+            middle_key = self._get_key_at(middle_index)
+            if key == middle_key:
+                self._array_list.set_at(middle_index, mapping)
                 return
-            elif current_key < key:
-                lower_bound = middle + 1
+            if key < middle_key:
+                index = middle_index
+                upper_index = middle_index - 1
             else:
-                upper_bound = middle - 1
-        self._array_list.insert_at(lower_bound, (key, new_value))
+                index = middle_index + 1
+                lower_index = middle_index + 1
+        self._array_list.insert_at(index, mapping)
 
     def remove(self, key: Key) -> Value:
         """
@@ -176,19 +180,19 @@ class SortedArrayMap(Base[Key, Value]):
         :returns: the corresponding value
         :raises KeyError: if the key was not in the map
         """
-        lower_bound = 0
-        upper_bound = self.get_length() - 1
-        while lower_bound <= upper_bound:
-            middle = (lower_bound + upper_bound) // 2
-            current_key = self._get_key_at(middle)
-            if current_key == key:
-                return self._array_list.remove_at(middle)[1]
-            elif current_key < key:
-                lower_bound = middle + 1
+        lower_index = 0
+        upper_index = self.get_length() - 1
+        while lower_index <= upper_index:
+            middle_index = (lower_index + upper_index) // 2
+            middle_key, middle_value = self._array_list.get_at(middle_index)
+            if key == middle_key:
+                self._array_list.remove_at(middle_index)
+                return middle_value
+            if key < middle_key:
+                upper_index = middle_index - 1
             else:
-                upper_bound = middle - 1
+                lower_index = middle_index + 1
         raise KeyError
-
 
     def iterator(self) -> Iterator[tuple[Key, Value]]:
         """
