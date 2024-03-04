@@ -1,11 +1,11 @@
 # [Data Structures & Algorithms](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/README.md): [Labs](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/README.md)
 
-## [Lab 5: Hash Maps](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab5/README.md)
+## [Lab 6: Binary Trees & Traversals](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab6/README.md)
 ```shell
-python labs 5*
+python labs 6*
 ```
 
-Welcome to lab 5! First things first: If you haven't gone through
+Welcome to lab 6! First things first: If you haven't gone through
 [lab 1](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab1/README.md), then make sure to read through
 what it says about getting your system ready for working on these labs. As a reminder, if you're on a lab machine you'll
 need to first:
@@ -43,34 +43,27 @@ Another little reminder from lab 1:
 Sometimes, you may want to not just run the test suite, but load the file you're working on into the Python REPL and
 play around with it. To do this, first open PyCharm's Python Console, which you can do by going to the top menu and
 selecting `Tools -> Python or Debug Console`, or by clicking the little Python icon in the bottom-left (that is, towards
-the bottom of the left bar). Then run e.g. `from lab5.core.chaining_hash_map.exercise import *` (changing the lab number
+the bottom of the left bar). Then run e.g. `from lab6.core.binary_tree.exercise import *` (changing the lab number
 and exercise name to whatever you're working on), after which you'll be able to run things like
 ```pycon
->>> map = ChainingHashMap()
->>> map.get_length()
-0
->>> map.insert("c", 2)
->>> map.insert("a", 1)
->>> map.insert("c", 3)
->>> map.insert("d", 2)
->>> map.insert("b", 3)
->>> for tile, points in map.iterator():
-...     print(f"'{tile}' is worth {points} point{'' if points == 1 else 's'}")
+>>> a = BinarySubtree(item="a")
+>>> b = BinarySubtree(item="b", left=a)
+>>> c = BinarySubtree(item="c")
+>>> b.insert_right(c)
+>>> tree = BinaryTree(root=b)
+>>> for item in tree.iterator():
+...     print(item)
 ...
-'a' is worth 1 point
-'b' is worth 3 points
-'c' is worth 3 points
-'d' is worth 2 points
->>> map.get_length()
-4
+a
+b
+c
+>>> tree.get_length()
+3
 ```
 
 ---
 
-- [Core](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab5/core/README.md)
-  - Hash Functions
-  - Chaining Hash Maps
-  - Probing Hash Maps
-- [Plus](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab5/plus/README.md)
-  - Entity-Component-System
-  - Linkers
+- [Core](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab6/core/README.md)
+  - Binary Trees
+- [Plus](https://github.com/bertie-wheen/dsa-2023-4/blob/trunk/labs/lab6/plus/README.md)
+  - (available soon!)
