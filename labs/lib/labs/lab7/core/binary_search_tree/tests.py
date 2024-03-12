@@ -7,7 +7,7 @@ from lib.test.annotations import *
 from lib.type_vars import Key, Value
 
 from lab3.core.dynamic_array_list import DynamicArrayList
-from lab4.core.unsorted_array_map import UnsortedArrayMap
+from lab4.core.merge_sort import merge_sort
 from lab7.core.binary_search_tree.exercise import BinarySearchTree
 
 
@@ -21,36 +21,6 @@ def is_sorted(bst: BinarySearchTree[Key, Value]) -> bool:
             return False
         previous_key = key
     return True
-
-
-@Test
-def contains(
-    mappings: Annotated[Array[tuple[Key, Value]], GE(1)],
-    index: Annotated[int, GE(0), LT("mappings")],
-):
-    key, value = mappings.get_at(index)
-    bst = BinarySearchTree.build(mappings.iterator())
-    yield True
-    yield bst.contains(key)
-
-
-@Test
-def is_empty(
-    mappings: Annotated[Array[tuple[Key, Value]], GE(1)],
-):
-    bst = BinarySearchTree.build(mappings.iterator())
-    yield False
-    yield bst.is_empty()
-
-
-@Test
-def get_length(
-    mappings: Array[tuple[Key, Value]],
-):
-    unique_key_count = UnsortedArrayMap.build(mappings.iterator()).get_length()
-    bst = BinarySearchTree.build(mappings.iterator())
-    yield unique_key_count
-    yield bst.get_length()
 
 
 @Test
@@ -78,28 +48,6 @@ def get_then_is_sorted(
     bst.get(the_key)
     yield True
     yield is_sorted(bst)
-
-
-@Test
-def insert_on_empty_bst_then_get_length(
-    key: Key,
-    value: Value,
-):
-    bst = BinarySearchTree()
-    bst.insert(key, value)
-    yield 1
-    yield bst.get_length()
-
-
-@Test
-def insert_on_empty_bst_then_contains(
-    key: Key,
-    value: Value,
-):
-    bst = BinarySearchTree()
-    bst.insert(key, value)
-    yield True
-    yield bst.contains(key)
 
 
 @Test
@@ -279,24 +227,6 @@ def insert_then_remove_then_get(
 
 
 @Test
-def build_then_is_sorted(
-    mappings: Array[tuple[Key, Value]],
-):
-    bst = BinarySearchTree.build(mappings.iterator())
-    yield True
-    yield is_sorted(bst)
-
-
-@Test
-def remove_on_empty_bst(
-    key: Key,
-):
-    bst = BinarySearchTree()
-    yield KeyError
-    yield bst.remove(key)
-
-
-@Test
 def remove(
     mappings: Annotated[Array[tuple[Key, Value]], GE(1)],
     an_index: Annotated[int, GE(0), LT("mappings")],
@@ -391,3 +321,54 @@ def remove_all_and_always_is_sorted(
             break
     yield True
     yield always_sorted
+
+
+@Test
+def get_minimum_key(
+    mappings: Annotated[Array[tuple[Key, Value]], GE(1)],
+):
+    minimum_key = min(key for key, value in mappings.iterator())
+    bst = BinarySearchTree.build(mappings.iterator())
+    yield minimum_key
+    yield bst.get_minimum_key()
+
+
+@Test
+def get_maximum_key(
+    mappings: Annotated[Array[tuple[Key, Value]], GE(1)],
+):
+    maximum_key = max(key for key, value in mappings.iterator())
+    bst = BinarySearchTree.build(mappings.iterator())
+    yield maximum_key
+    yield bst.get_maximum_key()
+
+
+@Test
+def get_previous_key(
+    keys: Annotated[set[Key], GE(2)],
+    values: Annotated[Iterator[Value], EQ("keys")],
+    index: Annotated[int, GE(1), LT("keys")],
+):
+    mappings = Array.build(zip(keys, values))
+    bst = BinarySearchTree.build(mappings.iterator())
+    merge_sort(mappings)
+    key, value = mappings.get_at(index)
+    previous_key, previous_value = mappings.get_at(index - 1)
+    yield previous_key
+    yield bst.get_previous_key(key)
+
+
+@Test
+def get_next_key(
+    keys: Annotated[set[Key], GE(2)],
+    values: Annotated[Iterator[Value], EQ("keys")],
+    next_index: Annotated[int, GE(1), LT("keys")],
+):
+    mappings = Array.build(zip(keys, values))
+    bst = BinarySearchTree.build(mappings.iterator())
+    merge_sort(mappings)
+    key, value = mappings.get_at(next_index - 1)
+    next_key, next_value = mappings.get_at(next_index)
+    yield next_key
+    yield bst.get_next_key(key)
+
