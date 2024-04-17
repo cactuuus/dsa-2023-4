@@ -77,14 +77,25 @@ class Labs:
                 ),
                 (
                     ("binary_tree",),
-                    (),
+                    ("huffman",),
                 ),
                 (
                     ("binary_search_tree",),
-                    (),
+                    ("students_data",),
                 ),
                 (
                     ("avl_tree",),
+                    (),
+                ),
+                (
+                    (
+                        "heap_sort",
+                        "binary_heap",
+                        "unsorted_list_priority_queue",
+                        "sorted_list_priority_queue",
+                        "avl_tree_priority_queue",
+                        "binary_heap_priority_queue",
+                    ),
                     (),
                 ),
             )
