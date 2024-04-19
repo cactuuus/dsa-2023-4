@@ -1,4 +1,7 @@
-from random import randint, random
+import random
+
+from lib.array import Array
+from lib.type_vars import Item
 
 
 def generate_bool(chance: float = 0.5) -> bool:
@@ -11,7 +14,7 @@ def generate_bool(chance: float = 0.5) -> bool:
     """
     if not 0 <= chance <= 1:
         raise ValueError
-    return random() < chance
+    return random.random() < chance
 
 
 def generate_int(lower: int, upper: int) -> int:
@@ -25,7 +28,7 @@ def generate_int(lower: int, upper: int) -> int:
     :returns: a random integer in that range
     :raises ValueError: if ``lower > upper``
     """
-    return randint(lower, upper)
+    return random.randint(lower, upper)
 
 
 def generate_index(count: int) -> int:
@@ -39,3 +42,10 @@ def generate_index(count: int) -> int:
     if count <= 0:
         raise ValueError
     return generate_int(0, count - 1)
+
+
+def shuffle(array: Array[Item]) -> None:
+    tmp = list(array.iterator())
+    random.shuffle(tmp)
+    for index, item in enumerate(tmp):
+        array.set_at(index, item)

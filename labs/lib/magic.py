@@ -1,6 +1,7 @@
 from collections.abc import Callable, Generator, Iterable, Iterator
 from copy import copy
 from enum import Enum
+from inspect import getclasstree
 from types import NoneType
 from typing import Any
 
@@ -47,14 +48,21 @@ def needs_no_id(thing):
         return True
     if thing_type is type:
         return True
+    if thing_type is tuple:
+        return True
     if issubclass(thing_type, Exception):
         return True
     if issubclass(thing_type, Iterator):
         return True
     if issubclass(thing_type, Enum):
         return True
+    if thing_type.__name__ == "Array":
+        return True
     if thing_type.__name__.endswith("Token"):
         return True
+    if thing_type.__name__ == "Edge":
+        return True
+    # TODO: more
     return False
 
 
@@ -78,6 +86,7 @@ def is_shallow(thing):
         return True
     if thing_type.__name__.endswith("Token"):
         return True
+    # TODO: more
     return False
 
 
@@ -138,11 +147,11 @@ def binary_subtree_to_string(subtree) -> str:
 def to_string(thing: Any) -> str:
     match type(thing).__name__:
         case "Player":
-            return members_to_string(thing, "xp", "position")
+            return members_to_string(thing, "_xp", "_position")
         case "Log":
             return "".join("\n" + item for item in thing.iterator())
         case "LogItem":
-            return members_to_string(thing, "time", "level", "message")
+            return members_to_string(thing, "_time", "_level", "_message")
         case "SinglyLinkedList" | "DoublyLinkedList":
             visited_nodes = []
             node_strings = []
@@ -211,11 +220,20 @@ def to_string(thing: Any) -> str:
         case "CommaToken":
             return ""
         case "HashFunction":
-            return members_to_string(thing, "a", "b", "size")
+            return members_to_string(thing, "_a", "_b", "_size")
         case "BinaryTree":
             return to_string(thing._root) if thing._root else ""
         case "BinarySubtree":
             return binary_subtree_to_string(thing)
+        case "Vertex":
+            return to_string(thing._item) if thing._item is not None else ""
+        case "Edge":
+            s = thing._source
+            t = thing._target
+            i = thing._item
+            if i is None:
+                return f"{s} -> {t}"
+            return f"{s} -[{i}]-> {t}"
     if isinstance(thing, Enum):
         return thing.name.title().replace("_", " ")
     if hasattr(thing, "iterator") and isinstance(thing.iterator, Callable):
@@ -246,6 +264,32 @@ def members_are_equal(thing_a: Any, thing_b: Any, *members: str) -> bool:
     return True
 
 
+def get_super(subtype: type) -> type:
+    return getclasstree([subtype])[0][0]
+
+
+def is_base(t: type) -> bool:
+    if t.__name__ == "Base":
+        return True
+    if t.__name__ == "object":
+        return False
+    return is_base(get_super(t))
+
+
+def less_or_equal(thing_a: Any, thing_b: Any) -> bool:
+    if not is_base(type(thing_a)):
+        return thing_a <= thing_b
+    if type(thing_a) is type(thing_b):
+        match type(thing_a).__name__:
+            case "Vertex":
+                return id(thing_a) <= id(thing_b)
+            case "Edge":
+                if thing_a._source is thing_b._source:
+                    return less_or_equal(thing_a._target, thing_b._target)
+                return less_or_equal(thing_a._source, thing_b._source)
+    return NotImplemented
+
+
 def are_equal(thing_a: Any, thing_b: Any) -> bool:
     if isinstance(thing_a, Iterator):
         if not isinstance(thing_b, Iterator):
@@ -262,32 +306,36 @@ def are_equal(thing_a: Any, thing_b: Any) -> bool:
         return thing_a.value == thing_b.value
     match type(thing_a).__name__:
         case "Player":
-            return members_are_equal(thing_a, thing_b, "xp", "position")
+            return members_are_equal(thing_a, thing_b, "_xp", "_position")
         case "Pair":
-            return members_are_equal(thing_a, thing_b, "first", "second")
+            return members_are_equal(thing_a, thing_b, "_first", "_second")
         case "Log":
-            return members_are_equal(thing_a, thing_b, "log")
+            return members_are_equal(thing_a, thing_b, "_log")
         case "LogItem":
-            return members_are_equal(thing_a, thing_b, "time", "level", "message")
+            return members_are_equal(thing_a, thing_b, "_time", "_level", "_message")
         case "SinglyLinkedNode" | "DoublyLinkedNode":
             return thing_a is thing_b
             # return members_are_equal(thing_a, thing_b, "item")
         case "ValueToken":
-            return members_are_equal(thing_a, thing_b, "value")
+            return members_are_equal(thing_a, thing_b, "_value")
         case "FunctionToken":
-            return members_are_equal(thing_a, thing_b, "name")
+            return members_are_equal(thing_a, thing_b, "_name")
         case "OperatorToken":
-            return members_are_equal(thing_a, thing_b, "operator")
+            return members_are_equal(thing_a, thing_b, "_operator")
         case "ParenthesisToken":
-            return members_are_equal(thing_a, thing_b, "parenthesis")
+            return members_are_equal(thing_a, thing_b, "_parenthesis")
         case "CommaToken":
             return True
         case "HashFunction":
-            return members_are_equal(thing_a, thing_b, "a", "b", "size")
+            return members_are_equal(thing_a, thing_b, "_a", "_b", "_size")
         case "BinaryTree":
-            return members_are_equal(thing_a, thing_b, "root")
+            return members_are_equal(thing_a, thing_b, "_root")
         case "BinarySubtree":
             return thing_a is thing_b
+        case "Vertex":
+            return thing_a is thing_b
+        case "Edge":
+            return members_are_equal(thing_a, thing_b, "_source", "_target")
     # if isinstance(thing_a, Iterable):
     #     return are_equal(iter(thing_a), iter(thing_b))
     if hasattr(thing_a, "iterator") and isinstance(thing_a.iterator, Callable):
