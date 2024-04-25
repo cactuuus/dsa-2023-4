@@ -98,6 +98,13 @@ class Labs:
                     ),
                     (),
                 ),
+                (
+                    (
+                        "graph",
+                        "breadth_first_search",
+                    ),
+                    (),
+                ),
             )
         return Labs._instance
 
