@@ -116,7 +116,9 @@ class BinaryHeap(Base[Key, Value]):
         :returns: the maximum item if the heap is a max-heap, else the minimum item
         :raises EmptyCollectionError: if the heap is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError()
+        return self._items.get_at(0)
 
     def insert(self, key: Key, value: Value) -> None:
         """
@@ -131,7 +133,8 @@ class BinaryHeap(Base[Key, Value]):
         :parameter key: the key
         :parameter value: the value
         """
-        raise NotImplementedError
+        self._items.insert_last((key, value))
+        self._heapify_up(self.get_length() - 1)
 
     def remove_root(self) -> tuple[Key, Value]:
         """
@@ -146,7 +149,14 @@ class BinaryHeap(Base[Key, Value]):
         :returns: what was the maximum (if the heap is a max-heap, else the minimum) item
         :raises EmptyCollectionError: if the heap is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError()
+        if self.get_length() == 1:
+            return self._items.remove_last()
+        self._swap(0, self.get_length() - 1)
+        removed_item = self._items.remove_last()
+        self._heapify_down(0)
+        return removed_item
 
     def _has_parent(self, index: int) -> bool:
         return self._get_parent(index) >= 0
@@ -221,7 +231,12 @@ class BinaryHeap(Base[Key, Value]):
         :parameter array: the array of items
         :parameter index: the index to heapify up from
         """
-        raise NotImplementedError
+        if not self._has_parent(index):
+            return
+        parent_index = self._get_parent(index)
+        if self._has_greater_key(index, parent_index):
+            self._swap(index, parent_index)
+            self._heapify_up(parent_index)
 
     def _heapify_down(self, index: int) -> None:
         """
@@ -236,7 +251,17 @@ class BinaryHeap(Base[Key, Value]):
         :parameter array: the array of items
         :parameter index: the index to heapify down from
         """
-        raise NotImplementedError
+        if self._is_leaf(index):
+            return
+        left_index = self._get_left(index)
+        greatest_child_index = left_index
+        if self._has_right(index):
+            right_index = self._get_right(index)
+            if self._has_greater_key(right_index, left_index):
+                greatest_child_index = right_index
+        if self._has_greater_key(greatest_child_index, index):
+            self._swap(index, greatest_child_index)
+            self._heapify_down(greatest_child_index)
 
     def _has_greater_key(self, greater_index: int, lesser_index: int) -> bool:
         """

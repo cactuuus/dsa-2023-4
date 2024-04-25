@@ -53,7 +53,7 @@ class BinaryHeapPriorityQueue(Base[Priority, Item]):
         :returns: a binary heap priority queue of those items
         """
         priority_queue = BinaryHeapPriorityQueue(is_max=is_max)
-        priority_queue._items = BinaryHeap.build(items)
+        priority_queue._items = BinaryHeap.build(items, is_max=is_max)
         return priority_queue
 
     def is_max(self) -> bool:
@@ -108,7 +108,7 @@ class BinaryHeapPriorityQueue(Base[Priority, Item]):
         | Space: | O(1)                       |
         +--------+----------------------------+
         """
-        raise NotImplementedError
+        self._items.insert(priority, item)
 
     def front(self) -> tuple[Priority, Item]:
         """
@@ -123,7 +123,7 @@ class BinaryHeapPriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        return self._items.get_root()
 
     def dequeue(self) -> tuple[Priority, Item]:
         """
@@ -138,4 +138,4 @@ class BinaryHeapPriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        return self._items.remove_root()

@@ -10,6 +10,7 @@ from collections.abc import Iterator
 
 from lib.array import Array
 from lib.base import Base
+from lib.errors import EmptyCollectionError
 from lib.type_vars import Priority, Item
 
 from lab3.core.dynamic_array_list import DynamicArrayList
@@ -47,7 +48,7 @@ class SortedListPriorityQueue(Base[Priority, Item]):
         is_max: bool = True,
     ) -> "SortedListPriorityQueue[Priority, Item]":
         """
-        Build an sorted list priority queue containing the given items.
+        Build a sorted list priority queue containing the given items.
 
         +--------+------------------+
         | Time:  | O(length(items)) |
@@ -57,7 +58,7 @@ class SortedListPriorityQueue(Base[Priority, Item]):
 
         :parameter items: an iterator of initial items
         :parameter is_max: ``True`` if it should be a max-queue, ``False`` if a min-queue (default ``True``)
-        :returns: an sorted list priority queue of those items
+        :returns: a sorted list priority queue of those items
         """
         priority_queue = SortedListPriorityQueue(is_max=is_max)
         sorted_items = Array.build(items)
@@ -120,7 +121,13 @@ class SortedListPriorityQueue(Base[Priority, Item]):
         | Space: | O(self.get_length()) |
         +--------+----------------------+
         """
-        raise NotImplementedError
+        index = 0
+        while index < self.get_length():
+            if self._is_higher_priority(priority, self._items.get_at(index)[0]):
+                index += 1
+            else:
+                break
+        self._items.insert_at(index, (priority, item))
 
     def front(self) -> tuple[Priority, Item]:
         """
@@ -135,7 +142,9 @@ class SortedListPriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        return self._items.get_last()
 
     def dequeue(self) -> tuple[Priority, Item]:
         """
@@ -150,7 +159,9 @@ class SortedListPriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        return self._items.remove_last()
 
     def _is_higher_priority(self, a: Priority, b: Priority) -> bool:
         if self._is_max:

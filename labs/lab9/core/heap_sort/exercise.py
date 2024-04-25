@@ -92,7 +92,11 @@ def _max_heapify_up(array: Array[Item], index: int) -> None:
     :parameter array: the array of items
     :parameter index: the index to heapify up from
     """
-    raise NotImplementedError
+    parent_index = _get_parent(index)
+    if index == 0 or array.get_at(index) < array.get_at(parent_index):
+        return
+    _swap(array, index, parent_index)
+    _max_heapify_up(array, parent_index)
 
 
 def _max_heapify_down(array: Array[Item], index: int, length: int) -> None:
@@ -109,7 +113,17 @@ def _max_heapify_down(array: Array[Item], index: int, length: int) -> None:
     :parameter index: the index to heapify down from
     :parameter length: the length of the heap (which is a prefix of the whole array)
     """
-    raise NotImplementedError
+    left_index, right_index = _get_left(index), _get_right(index)
+    if left_index >= length:
+        return
+
+    largest_child = left_index
+    if right_index < length and array.get_at(left_index) < array.get_at(right_index):
+        largest_child = right_index
+
+    if array.get_at(index) < array.get_at(largest_child):
+        _swap(array, index, largest_child)
+        _max_heapify_down(array, largest_child, length)
 
 
 def heap_sort(array: Array[Item]) -> None:

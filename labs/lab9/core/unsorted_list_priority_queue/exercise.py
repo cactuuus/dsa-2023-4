@@ -114,7 +114,7 @@ class UnsortedListPriorityQueue(Base[Priority, Item]):
         | Space: | O(1)                       |
         +--------+----------------------------+
         """
-        raise NotImplementedError
+        self._items.insert_last((priority, item))
 
     def front(self) -> tuple[Priority, Item]:
         """
@@ -129,7 +129,14 @@ class UnsortedListPriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        item = self._items.get_at(0)
+        for i in range(1, self.get_length()):
+            new_item = self._items.get_at(i)
+            if self._is_higher_priority(new_item[0], item[0]):
+                item = new_item
+        return item
 
     def dequeue(self) -> tuple[Priority, Item]:
         """
@@ -144,7 +151,15 @@ class UnsortedListPriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        index = 0
+        item = self._items.get_at(0)[0]
+        for i in range(1, self.get_length()):
+            new_item = self._items.get_at(i)[0]
+            if self._is_higher_priority(new_item, item):
+                index, item = i, new_item
+        return self._items.remove_at(index)
 
     def _is_higher_priority(self, a: Priority, b: Priority) -> bool:
         if self._is_max:

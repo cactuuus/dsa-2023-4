@@ -9,6 +9,7 @@ AVL Tree Priority Queues Exercise
 from collections.abc import Iterator
 
 from lib.base import Base
+from lib.errors import EmptyCollectionError
 from lib.type_vars import Priority, Item
 
 from lab8.core.avl_tree import AVLTree
@@ -112,7 +113,7 @@ class AVLTreePriorityQueue(Base[Priority, Item]):
         | Space: | O(1)                       |
         +--------+----------------------------+
         """
-        raise NotImplementedError
+        self._items.insert(priority, item)
 
     def front(self) -> tuple[Priority, Item]:
         """
@@ -127,7 +128,11 @@ class AVLTreePriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        priority = self._items.get_maximum_key() if self._is_max else self._items.get_minimum_key()
+        item = self._items.get(priority)
+        return priority, item
 
     def dequeue(self) -> tuple[Priority, Item]:
         """
@@ -142,7 +147,11 @@ class AVLTreePriorityQueue(Base[Priority, Item]):
         :returns: a pair of the priority and item
         :raises EmptyCollectionError: if the priority queue is empty
         """
-        raise NotImplementedError
+        if self.is_empty():
+            raise EmptyCollectionError
+        priority = self._items.get_maximum_key() if self._is_max else self._items.get_minimum_key()
+        item = self._items.remove(priority)
+        return priority, item
 
     def iterator(self) -> Iterator[tuple[Priority, Item]]:
         priority_queue = AVLTreePriorityQueue.build(self._items.iterator(), is_max=self._is_max)
