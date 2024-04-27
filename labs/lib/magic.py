@@ -281,7 +281,11 @@ def less_or_equal(thing_a: Any, thing_b: Any) -> bool:
         return thing_a <= thing_b
     if type(thing_a) is type(thing_b):
         match type(thing_a).__name__:
+            case "Array":
+                return list(thing_a.iterator()) <= list(thing_b.iterator())
             case "Vertex":
+                if thing_a.get_item() != thing_b.get_item():
+                    return thing_a.get_item() <= thing_b.get_item()
                 return id(thing_a) <= id(thing_b)
             case "Edge":
                 if thing_a._source is thing_b._source:
@@ -296,6 +300,8 @@ def are_equal(thing_a: Any, thing_b: Any) -> bool:
             return False
         if not isinstance(thing_a, Generator):
             thing_a = copy(thing_a)
+        # if not isinstance(thing_b, Generator):
+        #     thing_b = copy(thing_b)
         try:
             return all(are_equal(a, b) for a, b in zip(thing_a, thing_b, strict=True))
         except ValueError:

@@ -77,11 +77,11 @@ class Labs:
                 ),
                 (
                     ("binary_tree",),
-                    ("huffman",),
+                    (),
                 ),
                 (
                     ("binary_search_tree",),
-                    ("students_data",),
+                    (),
                 ),
                 (
                     ("avl_tree",),
@@ -102,6 +102,14 @@ class Labs:
                     (
                         "graph",
                         "breadth_first_search",
+                    ),
+                    (),
+                ),
+                (
+                    (
+                        "depth_first_search",
+                        "topological_sort",
+                        "dag_relaxation",
                     ),
                     (),
                 ),
