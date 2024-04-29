@@ -18,7 +18,7 @@ from lab5.core.chaining_hash_map import ChainingHashMap
 
 class Vertex(Base[VertexItem]):
     """
-    An vertex in a graph.
+    A vertex in a graph.
     """
 
     _item: VertexItem
@@ -197,7 +197,8 @@ class Graph(Base[VertexItem, EdgeItem]):
 
         :returns: an iterator over the graph's vertices
         """
-        raise NotImplementedError
+        for vertex in self._map.keys_iterator():
+            yield vertex
 
     def edges(self) -> Iterator[Edge[VertexItem, EdgeItem]]:
         """
@@ -212,7 +213,9 @@ class Graph(Base[VertexItem, EdgeItem]):
 
         :returns: an iterator over the graph's edges
         """
-        raise NotImplementedError
+        for value in self._map.values_iterator():
+            for edge in value.iterator():
+                yield edge
 
     def get_edge(self, source: Vertex[VertexItem], target: Vertex[VertexItem]) -> Optional[Edge[VertexItem, EdgeItem]]:
         """
@@ -228,7 +231,10 @@ class Graph(Base[VertexItem, EdgeItem]):
         :parameter target: the target vertex
         :returns: the edge between ``source`` and ``target`` if there is one, else ``None``
         """
-        raise NotImplementedError
+        for edge in self._map.get(source).iterator():
+            if edge.get_target() == target:
+                return edge
+        return None
 
     def degree(self, vertex: Vertex[VertexItem]) -> int:
         """
@@ -244,7 +250,9 @@ class Graph(Base[VertexItem, EdgeItem]):
         :returns: the degree of ``vertex``
         :raises KeyError: if ``vertex`` is not in the graph
         """
-        raise NotImplementedError
+        if not self._map.contains(vertex):
+            raise KeyError()
+        return self._map.get(vertex).get_length()
 
     def neighbours(self, vertex: Vertex[VertexItem]) -> Iterator[Vertex[VertexItem]]:
         """
@@ -260,4 +268,9 @@ class Graph(Base[VertexItem, EdgeItem]):
         :returns: an iterator over the vertex's neighbours
         :raises KeyError: if ``vertex`` is not in the graph
         """
-        raise NotImplementedError
+        if not self._map.contains(vertex):
+            raise KeyError
+        edges = self._map.get(vertex)
+        for edge in edges.iterator():
+            yield edge.get_target()
+
